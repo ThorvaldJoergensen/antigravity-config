@@ -1,6 +1,6 @@
 # Antigravity Global Configuration (`~/.gemini/config`)
 
-Personal, project-agnostic Google Antigravity agent configuration for **Thorvald Jørgensen** (`@ThorvaldJoergensen`).
+Personal, project-agnostic, cross-platform (macOS, Windows, Linux/WSL) Google Antigravity agent configuration for **Thorvald Jørgensen** (`@ThorvaldJoergensen`).
 
 ## What's Inside
 
@@ -12,41 +12,55 @@ Personal, project-agnostic Google Antigravity agent configuration for **Thorvald
   - **6 Non-Overlapping `pstack` utilities**: `automate-me`, `blast-radius`, `create-verification-skill`, `no-comments`, `technical-writing`, `unslop`
 - **`plugins/`**: Global Antigravity plugins (`gemini-api`, `google-antigravity-sdk`, `modern-web-guidance-plugin`).
 - **`agents/pstack-models.md`**: Synced copy of `~/.agents/pstack-models.md` (`inherit-parent` model policy).
-- **`agy-sync.sh`**: Cross-machine synchronization utility.
+- **`agy-sync.sh` & `agy-sync.ps1`**: Non-destructive cross-machine synchronization utilities for macOS/Linux/WSL/Git Bash (`.sh`) and native Windows PowerShell (`.ps1`).
+- **`.gitattributes`**: Enforces LF line endings on `.sh` / `.py` / `.md` files so Windows `git clone` (`core.autocrlf`) never breaks bash scripts in WSL or Git Bash.
 
 ---
 
-## Quick Start on a New PC / Mac
+## Non-Destructive Setup on Any PC / Mac
 
-### 1. Clone into `~/.gemini/config` and apply
+Never delete `~/.gemini` or an existing `~/.gemini/config` directory. Both commands below detect whether `~/.gemini/config` already exists (or is already a Git repo) and safely initialize or pull **in-place** without deleting any existing files or projects:
 
-If `~/.gemini/config` does not exist yet:
+### Windows (PowerShell)
 
-```bash
-git clone git@github.com:ThorvaldJoergensen/antigravity-config.git ~/.gemini/config
-~/.gemini/config/agy-sync.sh apply
+Antigravity resolves `~/.gemini/config` to `$HOME\.gemini\config` (`C:\Users\<you>\.gemini\config`):
+
+```powershell
+New-Item -ItemType Directory -Force -Path "$HOME\.gemini\config" | Out-Null
+if (-not (Test-Path "$HOME\.gemini\config\.git")) {
+    git -C "$HOME\.gemini\config" init -b main
+    git -C "$HOME\.gemini\config" remote add origin https://github.com/ThorvaldJoergensen/antigravity-config.git
+    git -C "$HOME\.gemini\config" fetch origin
+    git -C "$HOME\.gemini\config" checkout -B main origin/main
+} else {
+    git -C "$HOME\.gemini\config" pull --rebase origin main
+}
+& "$HOME\.gemini\config\agy-sync.ps1" apply
 ```
 
-If Antigravity already created a default `~/.gemini/config` directory on the new machine:
+### macOS / Linux / WSL / Git Bash
 
 ```bash
-rm -rf ~/.gemini/config
-git clone git@github.com:ThorvaldJoergensen/antigravity-config.git ~/.gemini/config
+mkdir -p ~/.gemini/config
+if [ ! -d ~/.gemini/config/.git ]; then
+  git -C ~/.gemini/config init -b main
+  git -C ~/.gemini/config remote add origin git@github.com:ThorvaldJoergensen/antigravity-config.git
+  git -C ~/.gemini/config fetch origin
+  git -C ~/.gemini/config checkout -B main origin/main
+else
+  git -C ~/.gemini/config pull --rebase origin main
+fi
 ~/.gemini/config/agy-sync.sh apply
 ```
-
-*(Or with HTTPS / GitHub CLI: `gh repo clone ThorvaldJoergensen/antigravity-config ~/.gemini/config && ~/.gemini/config/agy-sync.sh apply`)*
 
 ---
 
-## Everyday `agy-sync.sh` Commands
+## Everyday Sync Commands
 
-Run `~/.gemini/config/agy-sync.sh <command>` from anywhere:
-
-| Command | Description |
-|---|---|
-| `~/.gemini/config/agy-sync.sh push` | Copies `~/.agents/pstack-models.md` into the repo, commits all skill/plugin updates in `~/.gemini/config`, and pushes to `origin/main`. |
-| `~/.gemini/config/agy-sync.sh pull` | Pulls the latest changes from GitHub (`git pull --rebase`) and restores `~/.agents/pstack-models.md`. |
-| `~/.gemini/config/agy-sync.sh apply` | Restores `~/.agents/pstack-models.md` and lists all active skills in `~/.gemini/config/skills`. |
-| `~/.gemini/config/agy-sync.sh export [file]` | Packs `~/.gemini/config` into a single portable archive (default: `~/antigravity-config-bundle.tar.gz`) for offline transfer. |
-| `~/.gemini/config/agy-sync.sh import [file]` | Extracts a portable `.tar.gz` bundle into `~/.gemini/config` and `~/.agents/`. |
+| Action | macOS / Linux / WSL / Git Bash | Windows PowerShell |
+|---|---|---|
+| **Pull latest (or bootstrap in-place)** | `~/.gemini/config/agy-sync.sh pull` | `& "$HOME\.gemini\config\agy-sync.ps1" pull` |
+| **Push local changes** | `~/.gemini/config/agy-sync.sh push` | `& "$HOME\.gemini\config\agy-sync.ps1" push` |
+| **Apply / verify** | `~/.gemini/config/agy-sync.sh apply` | `& "$HOME\.gemini\config\agy-sync.ps1" apply` |
+| **Export `.tar.gz`** | `~/.gemini/config/agy-sync.sh export` | `& "$HOME\.gemini\config\agy-sync.ps1" export` |
+| **Import `.tar.gz`** | `~/.gemini/config/agy-sync.sh import` | `& "$HOME\.gemini\config\agy-sync.ps1" import` |
