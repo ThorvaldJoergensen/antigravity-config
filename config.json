@@ -1,0 +1,39 @@
+{
+  "userSettings": {
+    "globalPermissionGrants": {
+      "allow": [
+        "unsandboxed(git grep)",
+        "unsandboxed(grep)",
+        "unsandboxed(ls)",
+        "unsandboxed(uv run pytest)",
+        "unsandboxed(uv run ruff)",
+        "unsandboxed(git status)",
+        "unsandboxed(git diff)",
+        "unsandboxed(./.venv/bin/pytest)",
+        "unsandboxed(./.venv/bin/ruff)",
+        "unsandboxed(.venv/bin/pytest)",
+        "unsandboxed(kubectl get)",
+        "unsandboxed(kubectl logs)",
+        "unsandboxed(git log)",
+        "unsandboxed(gcloud logging)",
+        "unsandboxed(.venv/bin/ruff)",
+        "unsandboxed(find app -maxdepth 3)",
+        "unsandboxed(pytest)",
+        "unsandboxed(which)",
+        "unsandboxed(git show)",
+        "unsandboxed(curl -s http://localhost:8083/.well-known/agent-card.json)",
+        "unsandboxed(find agents/planner_agent -maxdepth 3)",
+        "unsandboxed(find tests/unit/agents/planner_agent -maxdepth 3)",
+        "unsandboxed(git ls-files)",
+        "unsandboxed(find . -name \"*PROJECT*\" -o -name \"*architercture*\")",
+        "unsandboxed(head)",
+        "unsandboxed(sed)",
+        "unsandboxed(sed -n)",
+        "unsandboxed(git fetch)",
+        "unsandboxed(npm test)"
+      ]
+    },
+    "remoteControlHostname": "thorvald-mt6fw6wy2h-dark-vertex",
+    "themeMode": "THEME_MODE_DARK"
+  }
+}
