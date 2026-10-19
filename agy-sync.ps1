@@ -10,7 +10,6 @@ $ErrorActionPreference = "Stop"
 $ConfigDir = Join-Path $HOME ".gemini\config"
 $AgentsDir = Join-Path $HOME ".agents"
 $DefaultArchive = Join-Path $HOME "antigravity-config-bundle.tar.gz"
-$RepoUrl = "https://github.com/ThorvaldJoergensen/antigravity-config.git"
 
 function Stage-AgentsIntoConfig {
     $src = Join-Path $AgentsDir "pstack-models.md"
@@ -30,25 +29,6 @@ function Restore-AgentsFromConfig {
 }
 
 switch ($Command.ToLower()) {
-    { $_ -in @("pull", "bootstrap") } {
-        New-Item -ItemType Directory -Force -Path $ConfigDir | Out-Null
-        Push-Location $ConfigDir
-        try {
-            if (-not (Test-Path (Join-Path $ConfigDir ".git"))) {
-                Write-Host "Initializing Git in existing $ConfigDir without deleting local files..."
-                git init -b main
-                git remote add origin $RepoUrl
-                git fetch origin
-                git checkout -B main origin/main
-            } else {
-                git pull --rebase origin main
-            }
-            Restore-AgentsFromConfig
-            Write-Host "Synced and applied Antigravity config in $ConfigDir."
-        } finally {
-            Pop-Location
-        }
-    }
     "apply" {
         Restore-AgentsFromConfig
         $skillsPath = Join-Path $ConfigDir "skills"
@@ -68,8 +48,18 @@ switch ($Command.ToLower()) {
                 $date = Get-Date -Format "yyyy-MM-dd"
                 git commit -m "chore: sync Antigravity configuration ($date)"
             }
-            git push origin main
+            git push
             Write-Host "Pushed latest Antigravity config to remote."
+        } finally {
+            Pop-Location
+        }
+    }
+    "pull" {
+        Push-Location $ConfigDir
+        try {
+            git pull --rebase
+            Restore-AgentsFromConfig
+            Write-Host "Pulled and applied latest Antigravity config."
         } finally {
             Pop-Location
         }
@@ -94,11 +84,11 @@ switch ($Command.ToLower()) {
 Usage: ~/.gemini/config/agy-sync.ps1 <command> [arg]
 
 Commands:
-  pull / bootstrap   Safely initialize (if needed) or pull latest config without deleting existing files
-  push               Commit and push any skill/plugin updates in ~/.gemini/config
-  apply              Restore ~/.agents files and verify installed skills
-  export [path]      Create a single-file archive (default: ~/antigravity-config-bundle.tar.gz)
-  import [path]      Extract an archive into ~/.gemini/config and ~/.agents
+  apply           Restore ~/.agents files after cloning ~/.gemini/config on a new PC
+  push            Commit and push any skill/plugin updates in ~/.gemini/config
+  pull            Pull latest changes from GitHub and apply them
+  export [path]   Create a single-file archive (default: ~/antigravity-config-bundle.tar.gz)
+  import [path]   Extract an archive into ~/.gemini/config and ~/.agents
 "@
     }
 }
