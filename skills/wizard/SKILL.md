@@ -9,7 +9,7 @@ A **wizard** is a bash script that walks a human, step by step, through a manual
 
 The delightful UX is already solved by [template.sh](template.sh): stage-by-stage progress, confirmation gates, cross-platform URL opening (including WSL), hidden secret entry, idempotent `.env` upserts, `gh secret`/`gh variable` writes, and a closing summary. **Your job is only to scope the procedure and author its stages.** The library above the `STAGES` marker is identical in every wizard; that consistency is the point: never hand-edit it.
 
-A wizard is ephemeral by default: built for one run, saved to a scratch or `scripts/` path, deleted when the job's done. Commit it only when the user wants a repeatable setup path that should live in the repo.
+A wizard is ephemeral by default: always save generated wizard scripts to the OS temp dir (`$TMPDIR/wizard-<slug>.sh` on macOS/Linux, `%TEMP%\wizard-<slug>.sh` on Windows) or `<appDataDir>/brain/<conversation-id>/scratch/wizard-<slug>.sh`. Never save into a Git repository's `scripts/` directory or commit it unless the user explicitly asks for a repeatable repo setup script.
 
 ## Process
 
@@ -39,10 +39,6 @@ Hold the bar the template sets: open the URL before asking for its value, use `a
 ### 4. Verify and hand off
 
 - `bash -n <script>`; run `shellcheck` if available.
-- `chmod +x <script>`.
+- `chmod +x <script>` on macOS/Linux.
 - Don't run it end-to-end yourself: it opens browsers and blocks on human input. Trace it statically instead: every value from step 1 is captured and lands where step 1 said, and every `set_secret` name exactly matches a `secrets.*` reference in CI.
-- Tell the user how to run it. If it's a repeatable setup path, commit it and link it from the README so the next person runs the script instead of asking an AI.
-
-
-## Antigravity Zero-Git-Pollution Override
-- Always save generated wizard scripts to `$TMPDIR/wizard-<slug>.sh` or `~/.gemini/antigravity/brain/<conversation-id>/scratch/wizard-<slug>.sh`—**never** inside the Git repository's `scripts/` directory or committed to Git unless the user explicitly asks.
+- Tell the user how to run it (on macOS/Linux: `bash <script>`; on Windows: run in Git Bash or WSL, where `template.sh`'s `open_url` handles `wslview` and `explorer.exe`). If they asked for a repeatable repo script, commit and link it from `README.md`.

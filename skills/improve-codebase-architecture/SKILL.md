@@ -9,7 +9,7 @@ Surface architectural friction and propose **deepening opportunities**: refactor
 
 This command is _informed_ by the project's domain model and built on a shared design vocabulary:
 
-- Call the Skill tool with "codebase-design" for the architecture vocabulary (**module**, **interface**, **depth**, **seam**, **adapter**, **leverage**, **locality**) and its principles (the deletion test, "the interface is the test surface", "one adapter = hypothetical seam, two = real"). Use these terms exactly in every suggestion, and don't drift into "component," "service," "API," or "boundary."
+- Consult **codebase-design** for the architecture vocabulary (**module**, **interface**, **depth**, **seam**, **adapter**, **leverage**, **locality**) and its principles (the deletion test, "the interface is the test surface", "one adapter = hypothetical seam, two = real"). Use these terms exactly in every suggestion, and don't drift into "component," "service," "API," or "boundary."
 - The domain language in `GLOSSARY.md` gives names to good seams; ADRs in `docs/adr/` record decisions this command should not re-litigate.
 
 ## Process
@@ -35,7 +35,7 @@ Apply the **deletion test** to anything you suspect is shallow: would deleting i
 
 ### 2. Present candidates as an HTML report
 
-Write a self-contained HTML file to the OS temp directory so nothing lands in the repo. Resolve the temp dir from `$TMPDIR`, falling back to `/tmp` (or `%TEMP%` on Windows), and write to `<tmpdir>/architecture-review-<timestamp>.html` so each run gets a fresh file. Open it for the user (`xdg-open <path>` on Linux, `open <path>` on macOS, `start <path>` on Windows) and tell them the absolute path.
+Write a self-contained HTML file outside the Git repository so nothing lands in the working tree: either `<appDataDir>/brain/<conversation-id>/scratch/architecture-review-<timestamp>.html` or the OS temp directory (`$TMPDIR` or `/tmp` on macOS/Linux, `%TEMP%` on Windows) as `architecture-review-<timestamp>.html`. Open it for the user (`xdg-open <path>` on Linux, `open <path>` on macOS, `start "" "<path>"` on Windows) and tell them the absolute path.
 
 The report uses **Tailwind via CDN** for layout and styling, and **Mermaid via CDN** for diagrams where a graph/flow/sequence reliably communicates the structure. Mix Mermaid with hand-crafted CSS/SVG visuals: use Mermaid when relationships are graph-shaped (call graphs, dependencies, sequences), and hand-built divs/SVG when you want something more editorial (mass diagrams, cross-sections, collapse animations). Each candidate gets a **before/after visualisation**. Be visual.
 
@@ -60,16 +60,11 @@ Do NOT propose interfaces yet. After the file is written, ask the user: "Which o
 
 ### 3. Grilling loop
 
-Once the user picks a candidate, call the Skill tool with "grilling" to walk the decision tree with them: constraints, dependencies, the shape of the deepened module, what sits behind the seam, what tests survive.
+Once the user picks a candidate, follow **grilling** to walk the decision tree with them: constraints, dependencies, the shape of the deepened module, what sits behind the seam, what tests survive.
 
-Side effects happen inline as decisions crystallize; call the Skill tool with "domain-modeling" to keep the domain model current as you go:
+Side effects happen inline as decisions crystallize; follow **domain-modeling** to record domain updates in `<appDataDir>/brain/<conversation-id>/glossary.md` without creating untracked repo files:
 
-- **Naming a deepened module after a concept not in `GLOSSARY.md`?** Add the term to `GLOSSARY.md`. Create the file lazily if it doesn't exist.
-- **Sharpening a fuzzy term during the conversation?** Update `GLOSSARY.md` right there.
-- **User rejects the candidate with a load-bearing reason?** Offer an ADR, framed as: _"Want me to record this as an ADR so future architecture reviews don't re-suggest it?"_ Only offer when the reason would actually be needed by a future explorer to avoid re-suggesting the same thing; skip ephemeral reasons ("not worth it right now") and self-evident ones.
-- **Want to explore alternative interfaces for the deepened module?** Call the Skill tool with "codebase-design" and use its design-it-twice parallel sub-agent pattern.
-
-
-## Antigravity Zero-Git-Pollution Override
-- In Step 2, always write the HTML report to `$TMPDIR/architecture-review-<timestamp>.html` (or `~/.gemini/antigravity/brain/<conversation-id>/scratch/architecture-review-<timestamp>.html`) so nothing lands in the Git repository.
-- In Step 3, do not create or modify `GLOSSARY.md` or `docs/adr/` in the Git repository unless explicitly requested by the user.
+- **Naming a deepened module after a concept not in the glossary?** Add the term to `<appDataDir>/brain/<conversation-id>/glossary.md` (or update tracked `GLOSSARY.md` only if already tracked and requested).
+- **Sharpening a fuzzy term during the conversation?** Update the working glossary right there.
+- **User rejects the candidate with a load-bearing reason?** Offer an ADR, framed as: _"Want me to record this as an ADR so future architecture reviews don't re-suggest it?"_ Only offer when the reason would actually be needed by a future explorer to avoid re-suggesting the same thing; skip ephemeral reasons ("not worth it right now") and self-evident ones. Ask before writing into `docs/adr/`.
+- **Want to explore alternative interfaces for the deepened module?** Follow **codebase-design** (`DESIGN-IT-TWICE.md`) with parallel `invoke_subagent` calls.

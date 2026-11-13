@@ -10,7 +10,7 @@ Two-axis review of the diff between `HEAD` and a fixed point the user supplies:
 
 Both axes run as **parallel sub-agents** so they don't pollute each other's context, then this skill aggregates their findings.
 
-Issue Tracker Default: Use the project's active issue tracker (e.g., Jira via `acli`, GitHub Issues via `gh`, GitLab via `glab`, or Linear), or read from the current conversation / Antigravity session artifact directory (`~/.gemini/antigravity/brain/<conversation-id>/`).
+Issue Tracker Default: Use the project's active issue tracker (e.g., Jira via `acli`, GitHub Issues via `gh`, GitLab via `glab`, or Linear), or read from the current conversation / `<appDataDir>/brain/<conversation-id>/`.
 
 ## Process
 

@@ -5,7 +5,7 @@ description: "Generate a project-local verification skill that drives your app t
 
 # Create a verification skill
 
-Every serious project needs a scripted way to drive the real app and prove behavior: launch it, exercise a feature the way a user would, and capture evidence. This skill generates that as a project-local skill (`<skills>/verify-<app>/`) tailored to the repo. `<skills>` is your harness's project skill folder: `.cursor/skills/` in Cursor, `.claude/skills/` in Claude Code, `.pi/skills/` in Pi, `.agents/skills/` in Codex, OpenCode, and others. If the repo already keeps skills in one of these, use that one. You write the generator's output for the next agent, not for a human: it will be read cold, mid-task, by an agent that has never seen the app.
+Every serious project needs a scripted way to drive the real app and prove behavior: launch it, exercise a feature the way a user would, and capture evidence. This skill generates that as a project-local skill (`<skills>/verify-<app>/`) tailored to the repo, where `<skills>` is Antigravity's project skill folder (`.agents/skills/`). You write the generator's output for the next agent, not for a human: it will be read cold, mid-task, by an agent that has never seen the app.
 
 ## 1. Interview the repo, not the user
 
@@ -38,6 +38,6 @@ Create `<skills>/verify-<app>/features/README.md` plus one file per user-facing 
 
 Run its own instructions end to end once: launch, doctor, drive ONE mapped feature (one is enough; the map exists so later runs can cover the rest), capture evidence, clean up. After cleanup, confirm the evidence still exists at the named location — a cleanup that eats the proof fails this step. Fix what fails, and run the generated cleanup after every failed iteration too, so broken attempts don't strand processes and ports. A generated skill that was never executed is a draft, not a deliverable. If you proved it in a stand-in for the real target (a container in place of a fresh VM, a local stack in place of a remote one), list every setup step the stand-in did that the target will not. Those steps stay unverified until a run on the real target covers them.
 
-## 5. Offer the maintenance loop
+## 5. Keep the feature map current
 
-Point the user at `/maintain-verification-skill` for keeping the map honest as the app changes. Suggest a cadence only if they ask.
+Remind the user to update `<skills>/verify-<app>/features/` whenever user-facing routes, commands, or preconditions change, re-running one end-to-end drive after updates.

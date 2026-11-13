@@ -30,19 +30,28 @@ Personal default operating mode for **Thorvald Jørgensen** across all repositor
    - Surface the 1–3 real architectural forks concisely; run a full decision-tree interview (`grill-me` / `grilling`) when explicitly stress-testing a complex design.
 5. **Step-Gated Multi-Task Execution & Context Hygiene (`phase-boundaries.md`)**:
    - On multi-task implementation plans, execute one vertical slice (`tdd`) at a time, run the project's linter/formatter/tests, and pause for sign-off at major phase boundaries rather than running unverified multi-subagent chains.
-   - Stay within the ~150k-token **smart zone** (`playbooks/phase-boundaries.md`): between phases, deliberately choose between **Continue**, **`/handoff`** (to `$TMPDIR`), or **Subagent** (for self-contained read-only tasks like `code-review` or `research`).
+   - Stay within the ~150k-token **smart zone** (`playbooks/phase-boundaries.md`): between phases, deliberately choose between **Continue**, **`/handoff`** (to the OS temp dir), or **Subagent** (for self-contained read-only tasks like `code-review` or `research`).
 6. **Prove It Works & Zero Git Repository Pollution**:
-   - Never mutate tracked test fixtures or sample data during local runs; write generated outputs to gitignored local artifact directories or `$TMPDIR`.
-   - Never pollute a Git repository with untracked meta-files (`GLOSSARY.md`, `.scratch/`, `MISSION.md`, questionnaires, research notes, or bash wizards); keep all scratch artifacts in `$TMPDIR` or `~/.gemini/antigravity/brain/<conversation-id>/`.
+   - Never mutate tracked test fixtures or sample data during local runs; write generated outputs to gitignored local artifact directories or the OS temp dir (`$TMPDIR` on macOS/Linux, `%TEMP%` on Windows).
+   - Never pollute a Git repository with untracked meta-files (`GLOSSARY.md`, `.scratch/`, `MISSION.md`, questionnaires, research notes, or bash wizards); keep all scratch artifacts in `<appDataDir>/brain/<conversation-id>/` or the OS temp dir.
    - When debugging (`diagnosing-bugs`), build a fast red-capable reproduction loop first, redact secrets (`<REDACTED>`), and tag temporary logs with `[DEBUG-xxxx]` so 100% are removed before finishing.
    - Before opening a PR, run `code-review` (2-axis Spec + 12 Fowler Smells) and `no-comments`, slice changes into small, logical Conventional Commits, and open a **Draft PR** (`gh pr create --draft`) shaped with `pr` (smallest visual summary + Before/After proof + One-Way vs. Two-Way Door merge danger).
+
+## Subagents
+
+Set `invoke_subagent` `Model` explicitly by task instead of defaulting blindly to `inherit`:
+
+- **`flash_lite`** (fastest, minimal reasoning): High-volume grep, log filtering, and mechanical file classification.
+- **`flash`** (fast speed, balanced reasoning, Flash-tier such as Gemini Hydrogen): Codebase `research`, transcript slicing (`automate-me`), routine `no-comments` sweeps, and read-only status/test checks.
+- **`pro`** (standard speed, deep reasoning, Pro/Carbon-tier): Adversarial two-axis `code-review` (Standards + Spec), `codebase-design` (`DESIGN-IT-TWICE.md`) interface alternatives, subtle concurrency/security `blast-radius` audits, and hard `diagnosing-bugs` hypotheses.
+- **`inherit`**: Use when the parent session already matches the required tier; otherwise pick `flash` for fast legwork and `pro` for high-stakes review or design.
 
 ## Skill Routing
 
 | Situation | Skill to Invoke |
 |---|---|
 | Designing or deepening modules, interfaces, and seams | `codebase-design` (+ `DEEPENING.md`, `DESIGN-IT-TWICE.md`) |
-| Scanning a subsystem/repo for shallow modules (visual `$TMPDIR` HTML report) | `improve-codebase-architecture` |
+| Scanning a subsystem/repo for shallow modules (visual HTML report) | `improve-codebase-architecture` |
 | Investigating codebase, git history, issue tracker, or primary sources | `research` |
 | Stress-testing a design tree via frontier questions | `grill-me` / `grilling` / `grill-with-docs` |
 | Synthesizing a conversation into a technical spec | `to-spec` |
@@ -57,7 +66,7 @@ Personal default operating mode for **Thorvald Jørgensen** across all repositor
 | Stripping redundant comments and AI prose tells | `no-comments`, `technical-writing`, `unslop` |
 | Shaping and opening a Draft PR (`gh pr create --draft`) | `pr` + `playbooks/opening-a-pr.md` |
 | Post-session environment & skill improvement | `retro` / `automate-me` |
-| Writing a `/tmp` continuation brief for a new session | `handoff` |
+| Writing an OS-temp continuation brief for a new session | `handoff` |
 | Re-pitching a confusing message in plain English | `wait-what` |
 | Learning a new concept or subsystem interactively | `teach` |
 

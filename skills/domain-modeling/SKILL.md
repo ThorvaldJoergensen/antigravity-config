@@ -9,41 +9,16 @@ Actively build and sharpen the project's domain model as you design. This is the
 
 ## File structure
 
-Most repos have a single context:
+Read the repository's existing documentation first (`GLOSSARY.md`, `GLOSSARY-MAP.md`, `docs/adr/`, `docs/architecture/`, or project specs).
 
-```
-/
-├── GLOSSARY.md
-├── docs/
-│   └── adr/
-│       ├── 0001-event-sourced-orders.md
-│       └── 0002-postgres-for-write-model.md
-└── src/
-```
-
-If a `GLOSSARY-MAP.md` exists at the root, the repo has multiple contexts. The map points to where each one lives:
-
-```
-/
-├── GLOSSARY-MAP.md
-├── docs/
-│   └── adr/                          ← system-wide decisions
-├── src/
-│   ├── ordering/
-│   │   ├── GLOSSARY.md
-│   │   └── docs/adr/                 ← context-specific decisions
-│   └── billing/
-│       ├── GLOSSARY.md
-│       └── docs/adr/
-```
-
-Create files lazily: only when you have something to write. If no `GLOSSARY.md` exists, create one when the first term is resolved. If no `docs/adr/` exists, create it when the first ADR is needed.
+- **Working glossary default:** Capture working glossary definitions in `<appDataDir>/brain/<conversation-id>/glossary.md` rather than creating untracked root files.
+- **Repository files:** Never create untracked `GLOSSARY.md` or `docs/adr/` files in the Git repository automatically. Update `GLOSSARY.md` in place only if the repo already tracks it and the user wants it updated; write into `docs/adr/` only after confirming with the user.
 
 ## During the session
 
 ### Challenge against the glossary
 
-When the user uses a term that conflicts with the existing language in `GLOSSARY.md`, call it out immediately. "Your glossary defines 'cancellation' as X, but you seem to mean Y. Which is it?"
+When the user uses a term that conflicts with the existing language in `GLOSSARY.md` or `<appDataDir>/brain/<conversation-id>/glossary.md`, call it out immediately. "Your glossary defines 'cancellation' as X, but you seem to mean Y. Which is it?"
 
 ### Sharpen fuzzy language
 
@@ -57,11 +32,11 @@ When domain relationships are being discussed, stress-test them with specific sc
 
 When the user states how something works, check whether the code agrees. If you find a contradiction, surface it: "Your code cancels entire Orders, but you just said partial cancellation is possible. Which is right?"
 
-### Update GLOSSARY.md inline
+### Update the working glossary inline
 
-When a term is resolved, update `GLOSSARY.md` right there. Don't batch these up: capture them as they happen. Use the format in [GLOSSARY-FORMAT.md](./GLOSSARY-FORMAT.md).
+When a term is resolved, record it immediately using [GLOSSARY-FORMAT.md](./GLOSSARY-FORMAT.md) in `<appDataDir>/brain/<conversation-id>/glossary.md` (or the tracked repo `GLOSSARY.md` if the user wants it updated). Don't batch these up: capture them as they happen.
 
-`GLOSSARY.md` should be totally devoid of implementation details. Do not treat `GLOSSARY.md` as a spec, a scratch pad, or a repository for implementation decisions. It is a glossary and nothing else.
+Keep the glossary devoid of implementation details. Do not treat it as a spec, a scratch pad, or a repository for implementation decisions.
 
 ### Offer ADRs sparingly
 
@@ -71,11 +46,4 @@ Only offer to create an ADR when all three are true:
 2. **Surprising without context**: a future reader will wonder "why did they do it this way?"
 3. **The result of a real trade-off**: there were genuine alternatives and you picked one for specific reasons
 
-If any of the three is missing, skip the ADR. Use the format in [ADR-FORMAT.md](./ADR-FORMAT.md).
-
-
-## Antigravity Zero-Git-Pollution Override
-- **Never create untracked `/GLOSSARY.md` or `/docs/adr/` files in the Git repository automatically.**
-- When reading existing architecture context, check the repository's existing documentation directories (such as `docs/architecture/`, `docs/adr/`, or project specification docs).
-- Capture working glossary definitions in the Antigravity session artifact directory (`~/.gemini/antigravity/brain/<conversation-id>/glossary.md`) rather than the Git root, unless the repository already tracks `GLOSSARY.md` and the user wants it updated.
-- When all 3 ADR criteria hold (*Hard to reverse + Surprising without context + Real trade-off*), ask the user before writing an ADR file into the project's ADR directory.
+If any of the three is missing, skip the ADR. When all three hold, ask the user before writing a file into the project's ADR directory, using [ADR-FORMAT.md](./ADR-FORMAT.md).

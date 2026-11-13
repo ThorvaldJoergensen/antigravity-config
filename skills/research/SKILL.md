@@ -9,4 +9,4 @@ Investigate a question thoroughly against **primary sources** (codebase symbols,
 
 1. **Prefer primary sources over secondary summaries**: Verify claims directly against code, tests, runtime configs, and git history.
 2. **Subagent or direct**: For broad multi-file or multi-source investigations, dispatch a `research` subagent so your main context window stays clean.
-3. **Zero Git Pollution**: Present concise findings inline in chat with clickable `file://` links, or if a standalone report is needed, write it to the Antigravity session artifact directory (`~/.gemini/antigravity/brain/<conversation-id>/research-<slug>.md`) or `$TMPDIR`. **Never** write untracked research markdown files into the Git repository.
+3. **Zero Git Pollution**: Present concise findings inline in chat with clickable `file://` links, or if a standalone report is needed, write it to `<appDataDir>/brain/<conversation-id>/research-<slug>.md` or the OS temp dir (`$TMPDIR` on macOS/Linux, `%TEMP%` on Windows). **Never** write untracked research markdown files into the Git repository.

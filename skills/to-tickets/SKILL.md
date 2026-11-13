@@ -7,7 +7,7 @@ description: Break a plan, spec, or the current conversation into a set of trace
 
 Break a plan, spec, or conversation into a set of **tickets**: tracer-bullet vertical slices, each declaring the tickets that **block** it.
 
-Issue Tracker Default: Use the project's active issue tracker (e.g., Jira via `acli`, GitHub Issues via `gh`, GitLab via `glab`, or Linear), or write local specs/tickets to the Antigravity session artifact directory (`~/.gemini/antigravity/brain/<conversation-id>/`). Never create `.scratch/` or `docs/agents/` files inside the Git repository.
+Issue Tracker Default: Use the project's active issue tracker (e.g., Jira via `acli`, GitHub Issues via `gh`, GitLab via `glab`, or Linear), or write local tickets to `<appDataDir>/brain/<conversation-id>/`. Never create `.scratch/` or `docs/agents/` files inside the Git repository.
 
 ## Process
 
@@ -40,7 +40,7 @@ Give each ticket its **blocking edges**: the other tickets that must complete be
 
 ### 4. Quiz the user
 
-Present the proposed breakdown as a numbered list. For each ticket, show:
+Present the proposed breakdown as a numbered list (and optionally draft it to `<appDataDir>/brain/<conversation-id>/<slug>-tickets.md`). Omit Agile `"As a user, I want..."` boilerplate unless requested; keep tickets focused on technical behavior, module interfaces, acceptance criteria, and `Blocked by` edges. For each ticket, show:
 
 - **Title**: short descriptive name
 - **Blocked by**: which other tickets (if any) must complete first
@@ -52,14 +52,14 @@ Ask the user:
 - Are the blocking edges correct: does each ticket only depend on tickets that genuinely gate it?
 - Should any tickets be merged or split further?
 
-Iterate until the user approves the breakdown.
+Iterate until the user approves the breakdown and confirms remote mutation (when publishing to a real tracker).
 
 ### 5. Publish the tickets to the configured tracker
 
-Publish the approved tickets using the project's active issue tracker (`acli` for Jira, `gh` for GitHub, `glab` for GitLab) or the Antigravity session artifact directory (`~/.gemini/antigravity/brain/<conversation-id>/`):
+Publish the approved tickets using the project's active issue tracker (`acli` for Jira, `gh` for GitHub, `glab` for GitLab) or `<appDataDir>/brain/<conversation-id>/`:
 
-- **Local files** → write one file per ticket under `.scratch/<feature-slug>/issues/<NN>-<slug>.md`, numbered from `01` in dependency order (blockers first). Each file's "Blocked by" lists the numbers/titles it depends on. Use the per-ticket file template below: one ticket per file, never a single combined file.
-- **A real issue tracker (GitHub, Linear, …)** → publish one issue per ticket in dependency order (blockers first) so each ticket's blocking edges can reference real identifiers. Use the platform's native blocking relationship where it has one; otherwise set each ticket's "Blocked by" to the blocking issues. If the source was an existing issue, make each ticket its sub-issue (tracker doc's operation). Apply the `ready-for-agent` triage label unless instructed otherwise; the tickets are agent-grabbable by construction.
+- **Local files** → write one file per ticket under `<appDataDir>/brain/<conversation-id>/<slug>-tickets/<NN>-<slug>.md`, numbered from `01` in dependency order (blockers first). Never write ticket files into `.scratch/` inside a Git repository. Each file's "Blocked by" lists the numbers/titles it depends on. Use the per-ticket file template below: one ticket per file, never a single combined file.
+- **A real issue tracker (Jira, GitHub, GitLab, Linear)** → only create or edit remote issues after user confirmation. Publish one issue per ticket in dependency order (blockers first) so each ticket's blocking edges can reference real identifiers. Use the platform's native blocking relationship where it has one; otherwise set each ticket's "Blocked by" to the blocking issues. If the source was an existing issue, make each ticket its sub-issue when supported. Apply `ready-for-agent` unless instructed otherwise.
 
 Work the **frontier**: any ticket whose blockers are all done. For a purely linear chain that means top to bottom.
 
@@ -102,9 +102,3 @@ The end-to-end behaviour this ticket makes work, from the user's perspective, no
 </issue-template>
 
 In either form, avoid specific file paths or code snippets: they go stale fast. Exception: if a prototype produced a snippet that encodes a decision more precisely than prose can (state machine, reducer, schema, type shape), inline it and note briefly that it came from a prototype. Trim to the decision-rich parts, not a working demo, just the important bits.
-
-
-## Antigravity & Issue Tracker Publishing Override
-- **Zero Git Pollution**: Never write ticket files into `.scratch/` inside a Git repository.
-- **No Agile User Stories by Default**: Keep ticket descriptions focused on technical behavior, module interfaces, acceptance criteria, and `Blocked by` edges—no `"As a user, I want..."` fluff unless requested.
-- **Draft Before Remote Mutation**: Present the numbered breakdown (or write to `~/.gemini/antigravity/brain/<conversation-id>/<slug>-tickets.md`) and confirm with the user **before** creating or editing remote workitems (`acli`, `gh`, etc.).

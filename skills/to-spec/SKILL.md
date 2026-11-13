@@ -5,17 +5,17 @@ description: "Turn the current conversation into a spec and publish it to the pr
 
 This skill takes the current conversation context and codebase understanding and produces a spec. Do NOT interview the user; just synthesize what you already know.
 
-Issue Tracker Default: Use the project's active issue tracker (e.g., Jira via `acli`, GitHub Issues via `gh`, GitLab via `glab`, or Linear), or write local specs/tickets to the Antigravity session artifact directory (`~/.gemini/antigravity/brain/<conversation-id>/`). Never create `.scratch/` or `docs/agents/` files inside the Git repository.
+Issue Tracker Default: Use the project's active issue tracker (e.g., Jira via `acli`, GitHub Issues via `gh`, GitLab via `glab`, or Linear), or write local specs to `<appDataDir>/brain/<conversation-id>/`. Never create `.scratch/` or `docs/agents/` files inside the Git repository.
 
 ## Process
 
 1. Explore the repo to understand the current state of the codebase, if you haven't already. Use the project's domain glossary vocabulary throughout the spec, and respect any ADRs in the area you're touching.
 
-2. Sketch out the seams at which you're going to test the feature. Existing seams should be preferred to new ones. Use the highest seam possible. If new seams are needed, propose them at the highest point you can. The fewer seams across the codebase, the better - the ideal number is one.
+2. Sketch out the seams at which you're going to test the feature. Existing seams should be preferred to new ones. Use the highest seam possible. If new seams are needed, propose them at the highest point you can. The fewer seams across the codebase, the better; the ideal number is one.
 
 Check with the user that these seams match their expectations.
 
-3. Write the spec using the template below, then publish it to the project issue tracker. Apply the `ready-for-agent` triage label - no need for additional triage.
+3. Draft the spec using the template below. Omit Agile user stories (`"As a <actor>, I want..."`) unless explicitly requested; focus on problem statement, solution architecture, module interfaces, testing seams, and scope boundaries. Write the draft to `<appDataDir>/brain/<conversation-id>/<slug>-spec.md` or present it in chat first, and confirm with the user before publishing to the remote issue tracker (`acli`, `gh`, etc., applying `ready-for-agent` if applicable).
 
 <spec-template>
 
@@ -60,8 +60,3 @@ A description of the things that are out of scope for this spec.
 Any further notes about the feature.
 
 </spec-template>
-
-
-## Antigravity & Issue Tracker Rules
-- **No Agile User Stories by Default**: Omit `"As a <actor>, I want..."` user stories in technical specs and tickets unless explicitly requested. Focus on problem statement, solution architecture, module interfaces, testing seams, and scope boundaries.
-- **Draft First**: Write the spec to an Antigravity session artifact (`~/.gemini/antigravity/brain/<conversation-id>/<slug>-spec.md`) or present it in chat first. Only publish to the remote issue tracker (`acli`, `gh`, etc.) after the user approves the draft.

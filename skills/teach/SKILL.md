@@ -8,7 +8,11 @@ The user has asked you to teach them something. This is a stateful request - the
 
 ## Teaching Workspace
 
-Treat the current directory as a teaching workspace. Workspace paths (`./lessons/` and the rest) resolve from the directory `/teach` was run in; only the `*-FORMAT.md` links resolve from this skill's folder. The state of their learning is captured in this directory in several files:
+Set the teaching workspace root to keep any Git repository 100% clean:
+- If the active directory is inside a Git repository (or no dedicated learning folder is open), store the stateful teaching workspace in `<appDataDir>/brain/<conversation-id>/scratch/teach-<topic>/` (or OS temp dir `$TMPDIR/teach-<topic>/` on macOS/Linux, `%TEMP%\teach-<topic>\` on Windows).
+- Only write directly to `./` if the user explicitly opens a dedicated non-Git learning folder.
+
+Workspace paths (`./lessons/` and the rest) resolve inside that teaching workspace root; only the `*-FORMAT.md` links resolve from this skill's folder:
 
 - `MISSION.md`: A document capturing the _reason_ the user is interested in the topic. This should be used to ground all teaching. Use the format in [MISSION-FORMAT.md](./MISSION-FORMAT.md).
 - `./reference/*.html`: A directory of reference materials. These are the compressed learnings from the lessons - cheat sheets, reference algorithms, syntax, yoga poses, glossaries. They are the raw units of learning. They should be beautiful documents which print out well, and are designed for quick reference.
@@ -51,7 +55,7 @@ A lesson should be **beautiful**, with clean, readable typography and layout, si
 
 The lesson should be short, and completable very quickly. Learners' working memory is very small, and we need to stay within it. But each lesson should give the user a single tangible win that they can build on. It should be directly tied to the mission, and should be in the user's zone of proximal development.
 
-If possible, open the lesson file for the user by running a CLI command.
+If possible, open the lesson file for the user (`open <path>` on macOS, `xdg-open <path>` on Linux, `start "" "<path>"` on Windows).
 
 Each lesson should link via HTML anchors to other lessons and reference documents.
 
@@ -137,8 +141,3 @@ Glossaries, in particular, are an essential reference. Once one is created, it s
 ## `NOTES.md`
 
 The user will sometimes express preferences of how they want to be taught, or things you should keep in mind. This is the place to record those preferences, so you can refer back to them when designing lessons or working with the user.
-
-
-## Antigravity Zero-Git-Pollution Override
-- If the current working directory is inside a Git repository, **never** create `MISSION.md`, `RESOURCES.md`, `NOTES.md`, `./lessons/`, `./assets/`, or `./learning-records/` inside the Git repository!
-- Instead, create and maintain the stateful teaching workspace inside `~/.gemini/antigravity/brain/<conversation-id>/scratch/teach-<topic>/` (or `$TMPDIR/teach-<topic>/`) so the Git working tree remains 100% clean.

@@ -7,9 +7,9 @@ The user has asked for a **retrospective**. You are suggesting improvements to t
 
 ## Steps
 
-1. Call the Skill tool with `writing-for-agents` for the writing style guide.
+1. Follow **writing-for-agents** for the writing style guide.
 
-2. Read the primary sources for the session the user specifies. This may mean searching through session logs on this machine. If the user doesn't specify a session, default to the current one.
+2. Read the primary sources for the session the user specifies. This may mean reading `<appDataDir>/brain/<conversation-id>/.system_generated/logs/transcript.jsonl` (start compact; use `transcript_full.jsonl` only for lines with `truncated_fields`). If the user doesn't specify a session, default to the current one.
 
 3. Look for candidates for improvement in these categories.
 
@@ -35,13 +35,9 @@ This means that the review agent should be responsible for imposing coding stand
 
 ### Files
 
-You have access to several files in the repo:
+By default, apply steering/workflow improvements to the user's global Antigravity skills (`~/.gemini/config/skills/thorvald-mode/SKILL.md` or `%USERPROFILE%\.gemini\config\skills\thorvald-mode\SKILL.md` on Windows) rather than modifying tracked Git repository files (`AGENTS.md`, `GEMINI.md`, `CODING_STANDARDS.md`), unless the user explicitly asks to commit a repo change.
 
-- `CLAUDE.md`/`AGENTS.md`: these files are pushed to the context window of any agent working in this repo. They should be used incredibly sparingly, usually only for **navigation pointers** to other files.
-- `CODING_STANDARDS.md`: this file is read during review, not implementation. Add **navigation pointers** to docs folders if the standards file gets more than 1,000 lines long.
-- Docs: use docs as references files, pointed to by other files. Look for existing docs before writing new ones.
-- Skills: use skills for docs (since their description goes into the agent's context window), or for user-invoked commands. Follow the advice in the `writing-for-agents` skill.
-
-
-## Antigravity Local-First Override
-- By default, apply steering/workflow improvements to the user's **local Antigravity skills** (`~/.gemini/config/skills/thorvald-mode/SKILL.md` or other skills in `~/.gemini/config/skills/`) rather than modifying tracked Git repository files (`CLAUDE.md`, `AGENTS.md`, `CODING_STANDARDS.md`), unless the user explicitly asks to commit a repo change.
+- `AGENTS.md` / `GEMINI.md`: pushed to the context window of any agent working in the repo. Use sparingly, usually only for **navigation pointers** to other files.
+- `CODING_STANDARDS.md`: read during review, not implementation. Add **navigation pointers** to docs folders if the standards file grows large.
+- Docs: use repo docs as reference files pointed to by other files. Look for existing docs before writing new ones.
+- Skills: use skills for procedures and domain workflows. Follow **writing-for-agents** when editing them.
