@@ -1,4 +1,23 @@
+# Ignore machine-local state in ~/.gemini/config by default
+# (config.json, projects/, mcp_config.json, import_manifest.json, .migrated, node_modules/, sidecars/, etc.)
+*
+
+# Tracked repo metadata
+!.gitignore
+!.gitattributes
+!README.md
+
+# Tracked cross-OS skills and plugins
+!skills/
+!skills/**
+!plugins/
+!plugins/**
+
+# Always ignore OS, editor, and Python junk even inside skills/ and plugins/
 .DS_Store
+Thumbs.db
+Desktop.ini
 *.pyc
 __pycache__/
-antigravity-config-bundle.tar.gz
+*.swp
+*~

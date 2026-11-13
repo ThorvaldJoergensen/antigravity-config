@@ -1,48 +1,108 @@
 # Antigravity Global Configuration (`~/.gemini/config`)
 
-Personal, project-agnostic, cross-platform (macOS, Windows, Linux/WSL) Google Antigravity agent configuration for **Thorvald Jørgensen** (`@ThorvaldJoergensen`).
+Portable, project-agnostic, cross-OS (macOS, Windows, Linux/WSL) Google Antigravity configuration for **Thorvald Jørgensen** (`@ThorvaldJoergensen`).
 
-## What's Inside
+## What Is Tracked in Git
+
+Only portable global customizations are version-controlled (enforced by a whitelist `.gitignore`):
 
 - **`skills/` (30 global skills)**:
-  - **`thorvald-mode`**: Personal default operating mode & 10 project-agnostic playbooks (`feature`, `bug-fix`, `refactoring`, `investigation`, `code-review`, `opening-a-pr`, `phase-boundaries`, `prototype`, `pause-safely`, `session-pickup`).
-  - **23 Matt Pocock skills** (adapted for Antigravity, multi-tracker support via `acli`/`gh`, and zero Git repository pollution):
-    - *Engineering (16)*: `codebase-design`, `diagnosing-bugs`, `improve-codebase-architecture`, `to-tickets`, `to-spec`, `code-review`, `pr`, `domain-modeling`, `wizard`, `tdd`, `retro`, `ask-matt`, `prototype`, `grill-with-docs`, `implement`, `research`
-    - *Productivity (7)*: `to-questionnaire`, `grilling`, `grill-me`, `writing-for-agents`, `handoff`, `wait-what`, `teach`
-  - **6 Non-Overlapping `pstack` utilities**: `automate-me`, `blast-radius`, `create-verification-skill`, `no-comments`, `technical-writing`, `unslop`
-- **`plugins/`**: Global Antigravity plugins (`gemini-api`, `google-antigravity-sdk`, `modern-web-guidance-plugin`).
-- **`agents/pstack-models.md`**: Synced copy of `~/.agents/pstack-models.md` (`inherit-parent` model policy).
-- **`agy-sync.sh` & `agy-sync.ps1`**: Cross-machine synchronization utilities for macOS/Linux/WSL/Git Bash (`.sh`) and Windows PowerShell (`.ps1`).
-- **`.gitattributes`**: Enforces LF line endings on `.sh` / `.py` / `.md` files so Windows `git clone` (`core.autocrlf`) never breaks bash scripts in WSL or Git Bash.
+  - **`thorvald-mode`**: Personal default engineering mode, explicit subagent model-tier routing (`flash_lite`, `flash`, `pro`), and 10 playbooks (`feature`, `bug-fix`, `refactoring`, `investigation`, `code-review`, `opening-a-pr`, `phase-boundaries`, `prototype`, `pause-safely`, `session-pickup`).
+  - **Architecture, implementation & review skills**: `ask-matt`, `blast-radius`, `code-review`, `codebase-design`, `create-verification-skill`, `diagnosing-bugs`, `domain-modeling`, `grill-me`, `grill-with-docs`, `grilling`, `handoff`, `implement`, `improve-codebase-architecture`, `no-comments`, `pr`, `prototype`, `research`, `retro`, `tdd`, `teach`, `technical-writing`, `to-questionnaire`, `to-spec`, `to-tickets`, `unslop`, `wait-what`, `wizard`, `writing-for-agents`, `automate-me`.
+- **`plugins/` (3 global plugins)**:
+  - `gemini-api` (`gemini-api-cli`, `gemini-api-dev`, `gemini-live-api-dev`, `gemini-omni-flash-api` + Gemini API Docs MCP)
+  - `google-antigravity-sdk`
+  - `modern-web-guidance-plugin` (`modern-web-guidance`, `chrome-extensions`)
+- **`.gitignore` & `.gitattributes`**: Whitelist ignore rules and LF/CRLF line-ending enforcement across Windows, macOS, and Linux.
+
+## What Stays Local on Each PC (Never Overwritten)
+
+- **Inside `~/.gemini/config/` (gitignored)**:
+  - `projects/*.json` (machine-local project workspaces, folder URIs, and sandbox permission grants)
+  - `config.json` (machine-local user settings, hostnames, and per-plugin enable/disable toggles)
+  - `mcp_config.json`, `import_manifest.json`, `.migrated`, `sidecars/`, `node_modules/`
+- **Outside `~/.gemini/config/`**:
+  - `~/.gemini/antigravity/` (conversations, `brain/` artifacts, transcripts)
+  - `~/.gemini/projects.json`, `oauth_creds.json`, `google_accounts.json`
+  - `~/.gemini/antigravity-cli/settings.json` (CLI trust & statusline config)
 
 ---
 
-## First-Time Setup on a New Machine
+## 1. First-Time Setup on a New PC (Preserves Local Projects & Chats)
 
-### Windows (PowerShell)
+Do **not** delete `~/.gemini/config` if Antigravity has already run on the machine (deleting it removes local `projects/*.json` and `config.json`). Initialize in place instead:
 
-```powershell
-if (Test-Path "$HOME\.gemini\config") { Remove-Item -Recurse -Force "$HOME\.gemini\config" }
-git clone https://github.com/ThorvaldJoergensen/antigravity-config.git "$HOME\.gemini\config"
-& "$HOME\.gemini\config\agy-sync.ps1" apply
-```
-
-### macOS / Linux / WSL / Git Bash
+### macOS / Linux (`bash` / `zsh`)
 
 ```bash
-rm -rf ~/.gemini/config
-git clone git@github.com:ThorvaldJoergensen/antigravity-config.git ~/.gemini/config
-~/.gemini/config/agy-sync.sh apply
+mkdir -p ~/.gemini/config
+git -C ~/.gemini/config init -b main
+git -C ~/.gemini/config remote add origin git@github.com:ThorvaldJoergensen/antigravity-config.git
+git -C ~/.gemini/config fetch origin
+git -C ~/.gemini/config reset origin/main
+git -C ~/.gemini/config branch --set-upstream-to=origin/main main
+git -C ~/.gemini/config checkout -f HEAD -- .gitignore .gitattributes README.md skills plugins
+git -C ~/.gemini/config clean -fd -- skills plugins
+```
+
+### Windows (`PowerShell`)
+
+```powershell
+$cfg = "$env:USERPROFILE\.gemini\config"
+New-Item -ItemType Directory -Force -Path $cfg | Out-Null
+git -C $cfg init -b main
+git -C $cfg remote add origin https://github.com/ThorvaldJoergensen/antigravity-config.git
+git -C $cfg fetch origin
+git -C $cfg reset origin/main
+git -C $cfg branch --set-upstream-to=origin/main main
+git -C $cfg checkout -f HEAD -- .gitignore .gitattributes README.md skills plugins
+git -C $cfg clean -fd -- skills plugins
 ```
 
 ---
 
-## Everyday Sync Commands (After First-Time Clone)
+## 2. Pull & Replace `skills/` and `plugins/` on Any PC
 
-| Action | macOS / Linux / WSL / Git Bash | Windows PowerShell |
-|---|---|---|
-| **Pull latest** | `~/.gemini/config/agy-sync.sh pull` | `& "$HOME\.gemini\config\agy-sync.ps1" pull` |
-| **Push changes** | `~/.gemini/config/agy-sync.sh push` | `& "$HOME\.gemini\config\agy-sync.ps1" push` |
-| **Apply / verify** | `~/.gemini/config/agy-sync.sh apply` | `& "$HOME\.gemini\config\agy-sync.ps1" apply` |
-| **Export `.tar.gz`** | `~/.gemini/config/agy-sync.sh export` | `& "$HOME\.gemini\config\agy-sync.ps1" export` |
-| **Import `.tar.gz`** | `~/.gemini/config/agy-sync.sh import` | `& "$HOME\.gemini\config\agy-sync.ps1" import` |
+Updates `skills/` and `plugins/` to match `origin/main` (removing deleted or untracked skills/plugins) without touching `config.json`, `projects/*.json`, or conversations:
+
+### macOS / Linux (`bash` / `zsh`)
+
+```bash
+git -C ~/.gemini/config fetch --prune origin
+git -C ~/.gemini/config reset origin/main
+git -C ~/.gemini/config checkout -f HEAD -- .gitignore .gitattributes README.md skills plugins
+git -C ~/.gemini/config clean -fd -- skills plugins
+```
+
+### Windows (`PowerShell`)
+
+```powershell
+$cfg = "$env:USERPROFILE\.gemini\config"
+git -C $cfg fetch --prune origin
+git -C $cfg reset origin/main
+git -C $cfg checkout -f HEAD -- .gitignore .gitattributes README.md skills plugins
+git -C $cfg clean -fd -- skills plugins
+```
+
+---
+
+## 3. Push Skill or Plugin Updates
+
+Stage only portable customizations so machine-local `projects/` and `config.json` are never pushed:
+
+### macOS / Linux (`bash` / `zsh`)
+
+```bash
+git -C ~/.gemini/config add -A -- skills plugins README.md .gitignore .gitattributes
+git -C ~/.gemini/config commit -m "Update Antigravity skills/plugins"
+git -C ~/.gemini/config push
+```
+
+### Windows (`PowerShell`)
+
+```powershell
+$cfg = "$env:USERPROFILE\.gemini\config"
+git -C $cfg add -A -- skills plugins README.md .gitignore .gitattributes
+git -C $cfg commit -m "Update Antigravity skills/plugins"
+git -C $cfg push
+```
